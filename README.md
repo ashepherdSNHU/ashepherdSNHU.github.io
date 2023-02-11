@@ -118,3 +118,115 @@ public class GradeProject {
 }
 ```
 
+---
+
+### Artifact \#2 - Algorithms & Data Structures
+
+* The artifact chosen for this milestone is the Animal Shelter project from the CS-340 – Client/Server Development Course. It was originally created in August of 2022. The application is written in Python. The entire project is an application that allows the user to select dogs that fit certain criteria from a database. There were many different aspects of the dogs that the user could then filter with the program: breed, age, sex, location, size, etc. The user had the ability to interact with the database using create, read, update, and delete operations (CRUD). The class that will be updated as part of this artifact is the CRUD operations class. 
+
+#### Enhancements and Justifications of Artifact Inclusion
+
+* This artifact was chosen as it has a great representation of my ability to create a class with multiple methods that also interact with a database. It gives me the opportunity to use a data structure to reduce some of the excess code that is repeated. It is also a great candidate to display the readability of the code that I write, in terms of formatting, clear code sections, and informative comments. In particular, to show my skills in data structures, I’ve implemented a list data type that will be accessed in each of the four CRUD methods. This list contains the string statements that are displayed to the user when there is an exception thrown by insufficient data being passed to the method. 
+* To improve the code, the following changes were made. Initially, FIXME comments were added to the different parts of the code that were going to be enhanced. These included the new list section, debug statements that needed removing. the header section, as well as a few spots in the method where clarity was needed. Then the detailed comments were added to those sections. There were also a few comments that needed to be indented to line up with there respective method declaration lines. 
+Next, the list was created. This was placed directly underneath the class declaration line. Each statement was taken from their original positions within the methods and placed within the list. There are two statements in total for the four methods. Next up, the exception statements within each method were replaced with the call to the new lists, using the correct index number for each. Then, more comments were added to the header to provide more clarity of the program’s intention and functionality. Finally, the debug statements were removed from their positions, as these are no longer needed.
+
+#### Course Objectives
+
+* For this enhancement, the course objective was to solve a given problem by using algorithmic principles and computer science practices and standards appropriate to its solution, while managing the trade-offs involved in design choices. I accomplished this by making good use of a data structure type that is extremely useful in programming, the list. This array type allows for grouping multiple items together into comma separated values. These different items in the list are then accessed via their index (or position) within the list by calling the list name and include the desired index. The list I created contains two different strings. These strings were originally inside of each CRUD method as an exception statement. Now inside of each statement exists the call to the list with either a 0 or 1 as the index argument. One of the benefits of this is the reduction of code, creating a smaller code base. If more methods were created in this class, the list could easily be implemented there, or even modified to include additional statements that can then be used as needed. 
+* Designing, developing, and delivering professional-quality oral, written, and visual communications that are coherent, technically sound, and appropriately adapted to specific audiences and contexts is a necessary skill in this day and age. The ability to deliver a well written communication about the code is also being presented here. By adding pertinent information to this narrative, the reader can clearly determine what changes were made to the code, what the intentions were, what the new enhancements offer in terms of increased programming abilities, and my ability to utilize the skills learned in the computer science courses. Looking at the header comments in the code, there is a clear description of the application’s purpose and its objective. There are details concerning the CRUD functionality, the type of database being used, MongoDB, and how the authorization works. 
+
+#### Reflection
+
+* One of the things that I learned while modifying this artifact is that readability is a very important component of well-written code. The formatting and sectioning of different parts of the code make it much more manageable in terms of finding particular items of interest. For instance, the different exceptions statements that I would be moving into the list easily stood out on the screen as they were each in the same position within their respective methods. Another thing I learned was that the placement of the list needs to be specific. It must be initialized before any piece of code that calls that list. If it’s not been created by the time the program makes its way to the list call, an error will occur. For this reason, the list is position before all of the CRUD method calls which use the list. 
+* As far as challenges while enhancing this artifact, there was nothing major that blocked my achievement of the modification. A list is a very common data type, and its implementation was relatively straightforward. I did need to reference the Python documentation to make sure the correct brackets were used in the list calls, the non-curly brackets []. I did have to determine where to place the line break within the list, as the exceptions statements are of decent length. Having them all on a single line of code would have made that code line extend much further out on the page. This would not affect functionality in any way; it would just be looked at as incorrect code formatting.
+
+```python
+"""
+The purpose of this class is to provide CRUD functionality to the application
+Each of the CRUD operations is contained within its own class method
+The init method contains the MongoDB address as well as defines the database
+
+MongoDB is the database used
+A username and password is required for authorization to use the database
+user/pass is fed from the file calling this class
+"""
+
+# Library imports
+# MongoClient enables work with MongoDB
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+
+class AnimalShelters(object):
+    """ CRUD operations for Animal collection in MongoDB """
+
+    # List containing exceptions text
+    exceptions_list = ["Nothing to save, because data parameter is empty",
+                       "Nothing to delete, because data parameter is empty"]
+    
+    # Init method, declaring class variables                       
+    def __init__(self, username, password):
+        # Initializing the MongoClient. This helps to 
+        # access the MongoDB databases and collections. 
+        self.username = username
+        self.password = password
+        self.client = MongoClient('mongodb://%s:%s@localhost:53184/AAC' % (username, password))
+        self.database = self.client['AAC']
+
+    # Create method. Uses the insert() Mongo method
+    # Pass in key/value pairs in JSON format. Requires one argument
+    # 'data' will be dict type
+    def create(self, data) -> bool:
+        try:
+            if data is not None:
+                self.database.animals.insert(data)  
+                return True
+            else:
+                raise Exception(exceptions_list[0])
+                return False
+        except Exception as e:
+            print(e)
+
+    # Read method. Uses the find() Mongo method
+    # Pass in key/value pairs in JSON format. Requires one argument
+    # 'key_val' will be dict type
+    def read(self, key_val) -> set:
+        try:
+            if key_val is not None:                
+                data = self.database.animals.find(key_val, {"_id": False})
+            else:
+                data = Exception(exceptions_list[0])
+            return data
+        except Exception as e:
+            print(e)
+            
+    # Update method. Uses the updateOne() Mongo method    
+    # Pass in key/value pairs in JSON format. Requires two arguments
+    # 'data' and 'changes' will be dict types
+    def update(self, data, changes):
+        try:
+            if (data is not None) and (changes is not None):
+                setChange = {"$set":changes}
+                self.database.animals.update_one(data, setChange)
+                updated_doc = self.database.animals.find(changes)
+                return updated_doc
+            else:
+                data = Exception(exceptions_list[0])
+                return data
+        except Exception as e:
+            print(e)
+            
+    # Delete method. Uses the deleteOne() Mongo method
+    # Pass in key/value pairs in JSON format. Requires one argument
+    # 'data' will be dict type
+    def delete(self, data):
+        try:
+            if data is not None:
+                self.database.animals.delete_one(data)
+                deleted_doc = self.database.animals.find(data)
+                return deleted_doc
+            else:
+                data = Exception(exceptions_list[1])
+                return data
+        except Exception as e:
+            print(e)
+```
