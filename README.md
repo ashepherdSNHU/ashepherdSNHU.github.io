@@ -230,3 +230,130 @@ class AnimalShelters(object):
         except Exception as e:
             print(e)
 ```
+
+---
+
+### Artifact \#3 - Databases
+
+* The artifact chosen for this milestone is the Animal Shelter project from the CS-340 – Client/Server Development Course. It was originally created in August of 2022. The application is written in Python. The entire project is an application that allows the user to select dogs that fit certain criteria from a database. There were many different aspects of the dogs that the user could then filter with the program: breed, age, sex, location, size, etc. The user had the ability to interact with the database using create, read, update, and delete operations (CRUD). The class that will be updated as part of this artifact is the CRUD operations class. 
+
+#### Enhancements and Justifications of Artifact Inclusion
+
+* This artifact was chosen as a good example of my work with databases and creating classes that perform a specific grouping of functions. In this case, the class offers Create, Read, Update, and Destroy (CRUD, a very common methodology for interacting with databases) methods. As you can see in the class code, each method is created using the same structural format. A try/except block is used to mitigate any possible exception errors that may arise from either faulty input, or other computational errors. Inside each of those blocks, an if/else statement is used to compare the passed arguments to a value of None. This comparison serves as a guard against empty values being passed from the code calling this class. When an acceptable argument is passed to said method, it is processed according to each method’s needs: read, delete, etc. After performing the necessary operation(s), the returned data is sent back to the calling code for use by the user. These specific components above show my abilities to properly access and interact with databases. 
+
+* To improve the code, the following changes were made:
+First, FIXME comments were added to the code in the spots with planned enhancements. These were in the read method as well as just underneath the __init__ method. This serves as a guide and reminder of where I need to edit the code. Next, I created the call to the new method inside the read method. This method call is placed just under the read method’s declaration line. This is necessary as the data returned to this new method will be used later in the read method. Then, I created the how_many_items method. This was placed just under the __init__ method. A new line was created in this method to prompt the user for how many items they would like returned. The return statement was placed just after that to complete the method. The return statement was passed the variable containing the user’s number of items input from the previous line. I needed to add the argument to this new method, as a value needs to be returned. This argument then becomes the variable prompting for user input. I then added the argument variable in the call to the new method, back in the read method. Realizing that this new variable was not yet initialized, I created a line just above the method call initializing the variable with a value of zero. To implement this into the read method, a new MongoDB method was added to the .find() line. Using the .limit(#) method, the argument passed into it is the variable containing the returned value from the new method created for this enhancement. To complete the enhancement, the original FIXME comments were removed from the code and explanatory comments for the new changes were added. 
+
+#### Course Objectives
+
+* For this enhancement, the objective was to demonstrate my ability to work with databases and improve the code that demonstrates this skill. I accomplished this skill by identifying a potential problem in the number of items returned by the database. Depending on the database, a user could receive numerous returned items (hundreds, thousands ?) which could overwhelm them. It could also cause the computer system to ‘hang’ when waiting an excessive number of items. To mitigate these two issues, a new option was offered with this enhancement. The user could restrict the returned number of items. This lessens the strain on the database system and provides a cleaner, more usable set of data for which the user can observe. This enhancement also demonstrates my ability to employ strategies for building collaborative environments that enable diverse audiences to support organizational decision making in the computer science field.
+* The issue of excessive data being returned by the database causes users to wait for processing of the database to complete. This wait time is inefficient and produces no positive outcome in terms of productivity for the team. By creating a cap on the number of returned items, this enhancement gives each team member the ability to decrease wait times and improve workflow both for the user and the machines running the applications, increasing efficiency and productivity.
+
+#### Reflection
+
+* As I worked through this enhancement, I was reminded of the differing types of conventions that programming languages use. Python is like any other language in that it has similar naming conventions while also possessing differing ones. Consulting Python’s programming standards, I was able to properly format the method names, the variable names, as well as the method construction format. Another Python special format that I needed to ascertain was how to prompt the user for input. Here, I consulted the Python documentation to procure the correct implementation. Lastly, I had to consult the MongoDB documentation to determine which method was needed to restrict the returned items. 
+* As for what I learned in this exercise, one overarching theme was programming language standards. With all the different languages available to use, it is imperative that reading the documentation and using language-specific formatting standards is enacted. This ensures readability for other developers as they will for sure be reading my code in the future. Adhering to standards makes for a more cohesive and more productive learning and working environment. Some companies will also enact their own standards, making this practice even more pertinent to developer cohesiveness. 
+
+```python
+
+"""
+The purpose of this class is to provide CRUD functionality to the application
+Each of the CRUD operations is contained within its own class method
+The init method contains the MongoDB address as well as defines the database
+A method to accept user input restricts the number of returned items in the read method. 
+
+
+MongoDB is the database used
+A username and password is required for authorization to use the database
+user/pass is fed from the file calling this class
+"""
+
+# Library imports
+# MongoClient enables work with MongoDB
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+
+class AnimalShelters(object):
+    """ CRUD operations for Animal collection in MongoDB """
+
+    # List containing exceptions text
+    exceptions_list = ["Nothing to save, because data parameter is empty",
+                       "Nothing to delete, because data parameter is empty"]
+    
+    # Init method, declaring class variables                       
+    def __init__(self, username, password):
+        # Initializing the MongoClient. This helps to 
+        # access the MongoDB databases and collections. 
+        self.username = username
+        self.password = password
+        self.client = MongoClient('mongodb://%s:%s@localhost:53184/AAC' % (username, password))
+        self.database = self.client['AAC']
+
+    # Prompt user for input of how many items they desire to be returned in read method
+    # Return value is a num type
+    def how_many_items(self, numItems):
+        numItems = print("How many options would you like returned? ")
+        return numItems
+
+    # Create method. Uses the insert() Mongo method
+    # Pass in key/value pairs in JSON format. Requires one argument
+    # 'data' will be dict type
+    def create(self, data) -> bool:
+        try:
+            if data is not None:
+                self.database.animals.insert(data)  
+                return True
+            else:
+                raise Exception(exceptions_list[0])
+                return False
+        except Exception as e:
+            print(e)
+
+    # Method to prompt user for number of returned items
+    # The variable declaration is simply for the object passed to the method call
+    # Read method. Uses the find() Mongo method
+    # Pass in key/value pairs in JSON format. Requires one argument
+    # 'key_val' will be dict type
+    def read(self, key_val) -> set:
+        numItems = 0
+        how_many_items(numItems)
+        try:
+            if key_val is not None:                
+                data = self.database.animals.find(key_val, {"_id": False}).limit(numItems)
+            else:
+                data = Exception(exceptions_list[0])
+            return data
+        except Exception as e:
+            print(e)
+            
+    # Update method. Uses the updateOne() Mongo method    
+    # Pass in key/value pairs in JSON format. Requires two arguments
+    # 'data' and 'changes' will be dict types
+    def update(self, data, changes):
+        try:
+            if (data is not None) and (changes is not None):
+                setChange = {"$set":changes}
+                self.database.animals.update_one(data, setChange)
+                updated_doc = self.database.animals.find(changes)
+                return updated_doc
+            else:
+                data = Exception(exceptions_list[0])
+                return data
+        except Exception as e:
+            print(e)
+            
+    # Delete method. Uses the deleteOne() Mongo method
+    # Pass in key/value pairs in JSON format. Requires one argument
+    # 'data' will be dict type
+    def delete(self, data):
+        try:
+            if data is not None:
+                self.database.animals.delete_one(data)
+                deleted_doc = self.database.animals.find(data)
+                return deleted_doc
+            else:
+                data = Exception(exceptions_list[1])
+                return data
+        except Exception as e:
+            print(e)
+```      
