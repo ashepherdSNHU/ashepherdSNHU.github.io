@@ -37,6 +37,63 @@ For the next two sections, the Animal Shelter project from the Client/Server Dev
 
 * One of my big takeaways from this enhancement is that something that seems a simple change at first will often contain many other changes that correspond to the intended change. Going forward, it will benefit me to take a broader view of the problem and attempt to reconcile all necessary additions that an enhancement will require for it to be fully realized. 
 
+#### Original Code Pre-Enhancement
+
+```java
+package gradeproject;
+
+/*
+The following program should compute a student's total course percentage 
+based on scores on three items of different weights (%s):
+
+    20% Homeworks (out of 80 points)
+    30% Midterm exam (out of 40 points)
+    50% Final exam (out of 70 points)
+
+*/
+
+import java.util.Scanner;
+
+public class GradeProject {
+   public static void main(String[] args) {
+      Scanner scnr = new Scanner(System.in);
+      final double HOMEWORK_MAX = 80.0;
+      final double MIDTERM_MAX  = 40.0;
+      final double FINAL_MAX    = 70.0;
+      final double HOMEWORK_WEIGHT = 0.20; 
+      final double MIDTERM_WEIGHT  = 0.30;
+      final double FINAL_WEIGHT    = 0.50;
+
+      double homeworkScore    = 0.0;
+      double midtermScore     = 0.0;
+      double finalScore       = 0.0;
+      double coursePercentage = 0.0;
+
+      System.out.println("Enter homework score:");
+      homeworkScore = scnr.nextDouble();
+
+      System.out.println("Enter midterm exam score:");
+      midtermScore = scnr.nextDouble();
+
+      System.out.println("Enter final exam score:");
+      finalScore = scnr.nextDouble();
+
+      coursePercentage = ((homeworkScore / HOMEWORK_MAX) * HOMEWORK_WEIGHT)
+                       + ((midtermScore / MIDTERM_MAX)    * MIDTERM_WEIGHT)
+                       + ((finalScore / FINAL_MAX)          * FINAL_WEIGHT);
+      coursePercentage = coursePercentage * 100; // Convert fraction to %
+
+      System.out.print("Your course percentage: ");
+      System.out.println(coursePercentage);
+
+      return;
+   }
+}
+
+```
+
+#### Enhanced Code
+
 ```java
 package gradeproject;
 
@@ -139,6 +196,85 @@ Next, the list was created. This was placed directly underneath the class declar
 
 * One of the things that I learned while modifying this artifact is that readability is a very important component of well-written code. The formatting and sectioning of different parts of the code make it much more manageable in terms of finding particular items of interest. For instance, the different exceptions statements that I would be moving into the list easily stood out on the screen as they were each in the same position within their respective methods. Another thing I learned was that the placement of the list needs to be specific. It must be initialized before any piece of code that calls that list. If it’s not been created by the time the program makes its way to the list call, an error will occur. For this reason, the list is position before all of the CRUD method calls which use the list. 
 * As far as challenges while enhancing this artifact, there was nothing major that blocked my achievement of the modification. A list is a very common data type, and its implementation was relatively straightforward. I did need to reference the Python documentation to make sure the correct brackets were used in the list calls, the non-curly brackets []. I did have to determine where to place the line break within the list, as the exceptions statements are of decent length. Having them all on a single line of code would have made that code line extend much further out on the page. This would not affect functionality in any way; it would just be looked at as incorrect code formatting.
+
+#### Original Code Pre-Enhancement (used in both artifact #2 & #3)
+
+```python
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+
+class AnimalShelters(object):
+    """ CRUD operations for Animal collection in MongoDB """
+
+    def __init__(self, username, password):
+        # Initializing the MongoClient. This helps to 
+        # access the MongoDB databases and collections. 
+        self.username = username
+        self.password = password
+        self.client = MongoClient('mongodb://%s:%s@localhost:53184/AAC' % (username, password))
+        self.database = self.client['AAC']
+
+# Create method. Uses the insert_one() Mongo method
+# Pass in key/value pairs in JSON format. Requires one argument
+    def create(self, data) -> bool:
+        try:
+            if data is not None:
+                self.database.animals.insert(data)  # data should be dictionary
+                print("True")
+                return True
+            else:
+                raise Exception("Nothing to save, because data parameter is empty")
+                return False
+        except Exception as e:
+            print(e)
+
+# Read method. Uses the find() Mongo method
+# Pass in key/value pairs in JSON format. Requires one argument
+    def read(self, key_val) -> set:
+        try:
+            if key_val is not None:                
+                data = self.database.animals.find(key_val, {"_id": False})
+            else:
+                data = Exception("Nothing to save, because data parameter is empty")
+            return data
+        except Exception as e:
+            print(e)
+            
+            
+# Update method. Uses the updateOne() Mongo method    
+# Pass in key/value pairs in JSON format. Requires two arguments
+    def update(self, data, changes):
+        try:
+            if (data is not None) and (changes is not None):
+                setChange = {"$set":changes}
+                self.database.animals.update_one(data, setChange)
+                updated_doc = self.database.animals.find(changes)
+                print('Update Successful!')
+                return updated_doc
+            else:
+                data = Exception("Nothing to save, because data parameter is empty")
+                return data
+        except Exception as e:
+            print(e)
+            
+# Delete method. Uses the deleteOne() Mongo method
+# Pass in key/value pairs in JSON format. Requires one argument
+    def delete(self, data):
+        try:
+            if data is not None:
+                self.database.animals.delete_one(data)
+                print("Delete Successful!")
+                deleted_doc = self.database.animals.find(data)
+                return deleted_doc
+            else:
+                data = Exception("Nothing to delete, because data parameter is empty")
+                return data
+        except Exception as e:
+            print(e)
+                
+```
+
+#### Enhanced Code
 
 ```python
 """
@@ -253,6 +389,86 @@ First, FIXME comments were added to the code in the spots with planned enhanceme
 
 * As I worked through this enhancement, I was reminded of the differing types of conventions that programming languages use. Python is like any other language in that it has similar naming conventions while also possessing differing ones. Consulting Python’s programming standards, I was able to properly format the method names, the variable names, as well as the method construction format. Another Python special format that I needed to ascertain was how to prompt the user for input. Here, I consulted the Python documentation to procure the correct implementation. Lastly, I had to consult the MongoDB documentation to determine which method was needed to restrict the returned items. 
 * As for what I learned in this exercise, one overarching theme was programming language standards. With all the different languages available to use, it is imperative that reading the documentation and using language-specific formatting standards is enacted. This ensures readability for other developers as they will for sure be reading my code in the future. Adhering to standards makes for a more cohesive and more productive learning and working environment. Some companies will also enact their own standards, making this practice even more pertinent to developer cohesiveness. 
+
+
+#### Original Code Pre-Enhancement (used in both artifact #2 & #3)
+
+```python
+from pymongo import MongoClient
+from bson.objectid import ObjectId
+
+class AnimalShelters(object):
+    """ CRUD operations for Animal collection in MongoDB """
+
+    def __init__(self, username, password):
+        # Initializing the MongoClient. This helps to 
+        # access the MongoDB databases and collections. 
+        self.username = username
+        self.password = password
+        self.client = MongoClient('mongodb://%s:%s@localhost:53184/AAC' % (username, password))
+        self.database = self.client['AAC']
+
+# Create method. Uses the insert_one() Mongo method
+# Pass in key/value pairs in JSON format. Requires one argument
+    def create(self, data) -> bool:
+        try:
+            if data is not None:
+                self.database.animals.insert(data)  # data should be dictionary
+                print("True")
+                return True
+            else:
+                raise Exception("Nothing to save, because data parameter is empty")
+                return False
+        except Exception as e:
+            print(e)
+
+# Read method. Uses the find() Mongo method
+# Pass in key/value pairs in JSON format. Requires one argument
+    def read(self, key_val) -> set:
+        try:
+            if key_val is not None:                
+                data = self.database.animals.find(key_val, {"_id": False})
+            else:
+                data = Exception("Nothing to save, because data parameter is empty")
+            return data
+        except Exception as e:
+            print(e)
+            
+            
+# Update method. Uses the updateOne() Mongo method    
+# Pass in key/value pairs in JSON format. Requires two arguments
+    def update(self, data, changes):
+        try:
+            if (data is not None) and (changes is not None):
+                setChange = {"$set":changes}
+                self.database.animals.update_one(data, setChange)
+                updated_doc = self.database.animals.find(changes)
+                print('Update Successful!')
+                return updated_doc
+            else:
+                data = Exception("Nothing to save, because data parameter is empty")
+                return data
+        except Exception as e:
+            print(e)
+            
+# Delete method. Uses the deleteOne() Mongo method
+# Pass in key/value pairs in JSON format. Requires one argument
+    def delete(self, data):
+        try:
+            if data is not None:
+                self.database.animals.delete_one(data)
+                print("Delete Successful!")
+                deleted_doc = self.database.animals.find(data)
+                return deleted_doc
+            else:
+                data = Exception("Nothing to delete, because data parameter is empty")
+                return data
+        except Exception as e:
+            print(e)
+                
+```
+
+#### Enhanced Code
 
 ```python
 
